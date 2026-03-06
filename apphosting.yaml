@@ -1,0 +1,37 @@
+# ============================================================
+#  Firebase App Hosting — apphosting.yaml
+#  Configures the Cloud Run-backed Next.js deployment
+# ============================================================
+
+runConfig:
+  # Cloud Run settings
+  minInstances: 0
+  maxInstances: 4
+  cpu: 1
+  memoryMiB: 512
+  concurrency: 80
+
+env:
+  # Public Firebase config (safe to expose — these are client-side)
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyCUy64Hkbu9QAitqdYo299gWsx8mgMOZaA
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: mohnsecurity.firebaseapp.com
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: mohnsecurity
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: mohnsecurity.firebasestorage.app
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "54846209283"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:54846209283:web:847195fb053fd0ff6a3d36"
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: G-QN9HS18BKC
+
+  # Webhook secret — stored in Cloud Secret Manager
+  # Create with: firebase apphosting:secrets:set WEBHOOK_SECRET --project mohnsecurity
+  - variable: WEBHOOK_SECRET
+    secret: WEBHOOK_SECRET
+    availability:
+      - BUILD
+      - RUNTIME

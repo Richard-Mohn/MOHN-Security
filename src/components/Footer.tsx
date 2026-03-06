@@ -5,23 +5,23 @@ import Link from "next/link";
 import { HiShieldCheck } from "react-icons/hi2";
 
 const footerLinks = {
-  Product: [
-    { label: "Features", href: "/#features" },
-    { label: "How It Works", href: "/#how-it-works" },
-    { label: "Pricing", href: "/#pricing" },
-    { label: "Dashboard", href: "/dashboard" },
+  Solutions: [
+    { label: "AI Detection", href: "/solutions/ai-detection" },
+    { label: "Sensor Networks", href: "/solutions/sensors" },
+    { label: "Deterrence", href: "/solutions/deterrence" },
+    { label: "Pricing", href: "/pricing" },
   ],
   Company: [
-    { label: "About Us", href: "/#about" },
-    { label: "Contact", href: "/#contact" },
-    { label: "Careers", href: "#" },
-    { label: "Blog", href: "#" },
+    { label: "About Us", href: "/about" },
+    { label: "Contact", href: "/contact" },
+    { label: "Careers", href: "/careers" },
+    { label: "Blog", href: "/blog" },
   ],
-  Support: [
-    { label: "Help Center", href: "#" },
-    { label: "Installation Guide", href: "#" },
-    { label: "System Status", href: "#" },
-    { label: "API Docs", href: "#" },
+  Resources: [
+    { label: "Documentation", href: "/docs" },
+    { label: "API Reference", href: "/docs/api" },
+    { label: "Help Center", href: "/support" },
+    { label: "System Status", href: "/status" },
   ],
   Legal: [
     { label: "Privacy Policy", href: "#" },

@@ -5,16 +5,16 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-middleware";
+import { getUid } from "@/lib/proxy-auth";
 import { adminDb } from "@/lib/firebase-admin";
 
 export async function GET(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const doc = await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("settings")
     .doc("system")
     .get();
@@ -36,15 +36,15 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   body.lastUpdated = new Date().toISOString();
 
   await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("settings")
     .doc("system")
     .set(body, { merge: true });

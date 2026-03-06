@@ -5,16 +5,16 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-middleware";
+import { getUid } from "@/lib/proxy-auth";
 import { adminDb } from "@/lib/firebase-admin";
 
 export async function GET(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const snapshot = await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("sensors")
     .orderBy("createdAt", "desc")
     .get();
@@ -24,8 +24,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { name, type, zone, features } = body;
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   const docRef = await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("sensors")
     .add({
       name,

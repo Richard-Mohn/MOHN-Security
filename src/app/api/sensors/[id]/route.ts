@@ -6,19 +6,19 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-middleware";
+import { getUid } from "@/lib/proxy-auth";
 import { adminDb } from "@/lib/firebase-admin";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(req: NextRequest, ctx: RouteContext) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await ctx.params;
   const doc = await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("sensors")
     .doc(id)
     .get();
@@ -31,8 +31,8 @@ export async function GET(req: NextRequest, ctx: RouteContext) {
 }
 
 export async function PATCH(req: NextRequest, ctx: RouteContext) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await ctx.params;
   const body = await req.json();
@@ -40,7 +40,7 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
 
   await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("sensors")
     .doc(id)
     .update(body);
@@ -49,13 +49,13 @@ export async function PATCH(req: NextRequest, ctx: RouteContext) {
 }
 
 export async function DELETE(req: NextRequest, ctx: RouteContext) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await ctx.params;
   await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("sensors")
     .doc(id)
     .delete();

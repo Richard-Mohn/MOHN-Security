@@ -4,12 +4,12 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-middleware";
+import { getUid } from "@/lib/proxy-auth";
 import { adminDb } from "@/lib/firebase-admin";
 
 export async function POST(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { action } = body; // "trigger" | "clear"
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("settings")
     .doc("system")
     .set(
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   // Also log as an event
   await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("events")
     .add({
       type: "alarm",

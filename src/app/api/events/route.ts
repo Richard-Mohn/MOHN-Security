@@ -5,12 +5,12 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyAuth } from "@/lib/auth-middleware";
+import { getUid } from "@/lib/proxy-auth";
 import { adminDb } from "@/lib/firebase-admin";
 
 export async function GET(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const limitParam = searchParams.get("limit");
@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   let query = adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("events")
     .orderBy("timestamp", "desc")
     .limit(limitParam ? parseInt(limitParam, 10) : 50);
@@ -38,8 +38,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const auth = await verifyAuth(req);
-  if ("error" in auth) return auth.error;
+  const uid = await getUid(req);
+  if (!uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
   const { type, severity, source, zone, description, snapshotUrl } = body;
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   const docRef = await adminDb
     .collection("users")
-    .doc(auth.user.uid)
+    .doc(uid)
     .collection("events")
     .add({
       type, // person, motion, audio, glass_break, alarm, system
